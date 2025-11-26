@@ -1,0 +1,45 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+before_script:
+  - python -m venv .venv
+  - source .venv/bin/activate
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+lint:
+  stage: lint
+  script:
+    - pip install ruff==0.5.7
+    - ruff check src tests
+
+unit_tests:
+  stage: test
+  script:
+    - pip install pytest==8.2.2
+    - pytest --maxfail=1 --disable-warnings --cov=src --cov-report=term
+  artifacts:
+    reports:
+      junit: junit.xml
+    when: always
+
+build_airflow_image:
+  stage: build
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/airflow:$CI_COMMIT_SHORT_SHA" -f infra/docker/airflow.Dockerfile .
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+
+deploy_airflow:
+  stage: deploy
+  script:
+    - |
+      echo "Trigger deployment via Terraform/Helm script"
+  rules:
+    - if: '$CI_COMMIT_TAG'

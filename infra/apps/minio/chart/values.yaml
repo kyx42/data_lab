@@ -1,0 +1,69 @@
+minio:
+  image:
+    repository: docker.io/minio/minio
+    tag: RELEASE.2024-12-18T13-15-44Z
+  mode: standalone
+  replicas: 1
+  rootUser: admin
+  rootPassword: ChangeMe123!
+
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 50Gi
+    storageClass: ""
+
+  buckets:
+    - name: lakehouse
+      policy: private
+      purge: false
+      versioning: true
+
+  policies:
+    - name: lakehouse-rw
+      statements:
+        - effect: Allow
+          resources:
+            - "arn:aws:s3:::lakehouse"
+            - "arn:aws:s3:::lakehouse/*"
+          actions:
+            - "s3:*"
+
+  users:
+    - accessKey: lakehouse-writer
+      secretKey: lakehouse-secret
+      policy: lakehouse-rw
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    path: /
+    hosts:
+      - s3.lab.local
+    tls: []
+
+  consoleIngress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    path: /
+    hosts:
+      - console.s3.lab.local
+    tls: []
+
+  environment:
+    MINIO_BROWSER_REDIRECT_URL: https://console.s3.lab.local:8443
+    MINIO_SERVER_DEBUG: "on"
+    MINIO_HTTP_TRACE: /tmp/minio-http-trace.log
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+
+  consoleResources:
+    requests:
+      cpu: 200m
+      memory: 128Mi

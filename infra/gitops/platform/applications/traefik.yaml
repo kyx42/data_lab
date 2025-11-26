@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: platform
+  destination:
+    namespace: traefik
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: http://host.k3d.internal:8081/root/traefik-helm.git
+    targetRevision: main
+    path: chart
+    helm:
+      releaseName: traefik
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

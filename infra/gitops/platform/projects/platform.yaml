@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: Base controllers deployed by Argo CD.
+  sourceRepos:
+    - http://host.k3d.internal:8081/root/minio-helm.git
+    - http://host.k3d.internal:8081/root/traefik-helm.git
+    - http://host.k3d.internal:8081/root/cert-manager-helm.git
+    - http://host.k3d.internal:8081/root/spark-operator-helm.git
+    - http://host.k3d.internal:8081/root/airflow-helm.git
+  destinations:
+    - namespace: minio
+      server: https://kubernetes.default.svc
+    - namespace: traefik
+      server: https://kubernetes.default.svc
+    - namespace: cert-manager
+      server: https://kubernetes.default.svc
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+    - namespace: spark-operator
+      server: https://kubernetes.default.svc
+    - namespace: spark-jobs
+      server: https://kubernetes.default.svc
+    - namespace: default
+      server: https://kubernetes.default.svc
+    - namespace: airflow
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

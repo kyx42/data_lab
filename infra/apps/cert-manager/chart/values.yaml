@@ -1,0 +1,16 @@
+cert-manager:
+  installCRDs: true
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  cainjector:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  webhook:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi

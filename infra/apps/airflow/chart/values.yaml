@@ -1,0 +1,113 @@
+airflow:
+  useStandardNaming: true
+  executor: "KubernetesExecutor"
+  images:
+    airflow:
+      repository: k3d-data-stack-lab-registry:5000/airflow-dags
+      tag: latest
+      pullPolicy: IfNotPresent
+
+  data:
+    metadataConnection:
+      user: airflow
+      pass: ChangeMe123!
+      protocol: postgresql
+      host: ~
+      port: 5432
+      db: airflow
+      sslmode: disable
+
+  fernetKey: JGUa0QUBHe1lxPRmSMdw0s1LMX4JMqKSIenfNpxueBY=
+  webserverSecretKey: 3KnKi2E_MueOdep-mwshC9E1GBTufSI2jM0opc-SxMM
+  apiSecretKey: 1010576725fc7e363d03ac8e1966c793a2d60d3bce707bd084bbaa68580b3f64
+
+  config:
+    api:
+      auth_backends: "airflow.api.auth.backend.basic_auth"
+
+  scheduler:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 500m
+        memory: 768Mi
+
+  webserver:
+    defaultUser:
+      enabled: true
+      role: Admin
+      username: admin
+      email: admin@lab.local
+      firstName: Data
+      lastName: Stack
+      password: ChangeMe123!
+    service:
+      type: ClusterIP
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+
+  triggerer:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi
+
+  workers:
+    persistence:
+      enabled: false
+
+  redis:
+    enabled: false
+
+  dags:
+    gitSync:
+      enabled: false
+      repo: http://host.k3d.internal:8081/root/data_stack.git
+      branch: main
+      ref: main
+      subPath: dags
+      period: 30s
+      credentialsSecret: airflow-git-credentials
+
+  ingress:
+    web:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      hosts:
+        - name: airflow.lab.local
+          tls:
+            enabled: false
+
+  postgresql:
+    enabled: true
+    image:
+      repository: bitnami/postgresql
+      tag: latest
+    auth:
+      enablePostgresUser: true
+      username: airflow
+      password: ChangeMe123!
+      database: airflow
+    primary:
+      persistence:
+        size: 10Gi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+  createUserJob:
+    useHelmHooks: false
+    applyCustomEnv: false
+  migrateDatabaseJob:
+    jobAnnotations:
+      "argocd.argoproj.io/hook": Sync
+    useHelmHooks: false
+    applyCustomEnv: false
+  waitForMigrations:
+    enabled: true

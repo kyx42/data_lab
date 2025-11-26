@@ -1,0 +1,8 @@
+apiVersion: v2
+name: minio-lab
+version: 0.1.0
+description: Helm wrapper chart for MinIO with lab defaults.
+dependencies:
+  - name: minio
+    version: 5.4.0
+    repository: https://charts.min.io/

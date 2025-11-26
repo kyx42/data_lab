@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: airflow
+  namespace: argocd
+spec:
+  project: platform
+  destination:
+    namespace: airflow
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: http://host.k3d.internal:8081/root/airflow-helm.git
+    targetRevision: main
+    path: chart
+    helm:
+      releaseName: airflow
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

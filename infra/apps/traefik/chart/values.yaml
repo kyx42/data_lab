@@ -1,0 +1,31 @@
+traefik:
+  ports:
+    web:
+      port: 8000
+    websecure:
+      port: 8443
+  service:
+    type: LoadBalancer
+  ingressRoute:
+    dashboard:
+      enabled: true
+      matchRule: Host(`traefik.lab.local`)
+      entryPoints:
+        - websecure
+  providers:
+    kubernetesIngress:
+      publishedService:
+        enabled: true
+  logs:
+    general:
+      level: INFO
+    access:
+      enabled: true
+  additionalArguments:
+    - --entrypoints.web.http.redirections.entryPoint.to=websecure
+    - --entrypoints.web.http.redirections.entryPoint.scheme=https
+  deployment:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi

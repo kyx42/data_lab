@@ -1,0 +1,10 @@
+apiVersion: v2
+name: airflow-lab
+version: 0.1.0
+description: Helm wrapper chart for Apache Airflow with lab defaults.
+dependencies:
+  - name: airflow
+    version: 1.18.0
+    repository: https://airflow.apache.org
+    alias: airflow
+

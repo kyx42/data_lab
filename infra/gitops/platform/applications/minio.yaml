@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: platform
+  destination:
+    namespace: minio
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: http://host.k3d.internal:8081/root/minio-helm.git
+    targetRevision: main
+    path: chart
+    helm:
+      releaseName: minio
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

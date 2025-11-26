@@ -1,0 +1,9 @@
+apiVersion: v2
+name: traefik-lab
+version: 0.1.0
+description: Helm wrapper chart for Traefik with lab defaults.
+dependencies:
+  - name: traefik
+    version: 23.2.0
+    repository: https://traefik.github.io/charts
+    alias: traefik
